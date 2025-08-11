@@ -1,0 +1,35 @@
+﻿uwagi.
+
+Semafory w tym przykładzie jako klasa SemaphoreSlim uzywane są do ograniczenia ilości 
+żądań HTTP.
+
+1.W konstruktorze klasy HttpRequestHandler , Semafor zainicjowany wartością równą 0 , wszystkie wątki 
+zablokowane aż do Release na Semaforze.
+
+2.Metoda _GetAsync, gdy wystąpi wyjątek brak zwolnienia licznika na Semaforze.
+
+3.Metoda _GetAsync, wywołuje samą siebie rekurencyjnie ale nie zwalnia licznika na Semaforze przed
+ponownym wywołaniem samej siebie.
+
+4.Nie jestem pewien co do lock czy jest potrzebne blokowanie kodu przed innymi wątkami , operacje na typach prostych
+"Value Type" są bezpieczne wielowątkowo.
+
+5.Zbedne GC.SuppressFinalize w klasie RestApiManagerWrapper brak destruktora.
+
+6. Z tą metodą nie wiem co zrobić bo nie wolno mi zmieniać interfacu IConnectionSupport
+a metoda RunImport, powinna miec inna sygnature powinna zwracac Taska i byc Asynchroniczna
+a wolania metod Asynchronicznych w środku powinny mieć await. 
+
+FivetranConnectionSupport RunImport, Parallel.ForEach nie jest bezpieczny wielowątkowo not thread safe.
+wywołanie metod do pobierania connectorów oznaczonych jako Async bez await co moze stwarzać problemy , 
+brak oczekiwania na zakonczenie metody i wynik , program pojdzie dalej, chyba ,że po to tutaj jest to
+ToBlockingEnumerable() żeby oczekiwał na koniec metod.
+
+7. SelectToImport tez powinny byc await przed wywolaniem synchronicznych metod, podobny matewr z ToBlockingEnumerable()
+by wymusic wykonanie metody bez await.
+
+8.Hardcoded stałe  timeout = 40 w metodach GetConnection , SelectToImport.
+
+
+
+
